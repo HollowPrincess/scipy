@@ -2206,14 +2206,18 @@ def lfiltic(b, a, y, x=None):
 
         L = np.size(x)
         if L < M:
-            x = np.r_[x, np.zeros(M - L)]
+            padded_x = np.zeros(len(x) + (M - L), dtype=x.dtype)
+            padded_x[:len(x)] = x
+            x = padded_x
 
     y = y.astype(result_type)
     zi = np.zeros(K, result_type)
 
     L = np.size(y)
     if L < N:
-        y = np.r_[y, np.zeros(N - L)]
+        padded_y = np.zeros(len(y) + (N - L), dtype=y.dtype)
+        padded_y[:len(y)] = y
+        y = padded_y
 
     for m in range(M):
         zi[m] = np.sum(b[m + 1:] * x[:M - m], axis=0)
@@ -3734,9 +3738,13 @@ def lfilter_zi(b, a):
 
     # Pad a or b with zeros so they are the same length.
     if len(a) < n:
-        a = np.r_[a, np.zeros(n - len(a), dtype=a.dtype)]
+        padded_a = np.zeros(n, dtype=a.dtype)
+        padded_a[:len(a)] = a
+        a = padded_a
     elif len(b) < n:
-        b = np.r_[b, np.zeros(n - len(b), dtype=b.dtype)]
+        padded_b = np.zeros(n, dtype=b.dtype)
+        padded_b[:len(a)] = b
+        b = padded_b
 
     IminusA = np.eye(n - 1, dtype=np.result_type(a, b)) - linalg.companion(a).T
     B = b[1:] - a[1:] * b[0]
